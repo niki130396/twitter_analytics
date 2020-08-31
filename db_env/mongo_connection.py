@@ -12,7 +12,15 @@ class MongoConnection(ABC):
         self.collection = self.database.tweet
 
 
-class QueryDispatcher(MongoConnection):
+class DataInserter(MongoConnection):
+    def __init__(self):
+        super().__init__()
+
+    def insert_one(self, document):
+        self.collection.insert_one(document)
+
+
+class DataRetriever(MongoConnection):
     def __init__(self):
         super().__init__()
         self.query_result = None
@@ -82,7 +90,7 @@ class DataExplorer(MongoConnection):
 
 
 if __name__ == '__main__':
-    obj = QueryDispatcher()
+    obj = DataRetriever()
     query = obj.select({"created_at": 1, "text": 1, "retweet_count": 1}).where({"retweet_count": 0}).query_result
     data_explorer = DataExplorer()
     print(data_explorer.toDataFrame(query))

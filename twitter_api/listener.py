@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 
 from twitter_api.credentials import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_TOKEN, ACCESS_SECRET
 
-from db_env.mongo_connection import MongoConnection
+from db_env.mongo_connection import DataInserter
 
 
 class TwitterAuthenticator(ABC):
@@ -22,13 +22,13 @@ class TwitterAuthenticator(ABC):
 class TwitterListener(StreamListener):
     def __init__(self):
         super().__init__()
-        self.db_connection = MongoConnection()
+        self.inserter = DataInserter()
 
     def on_status(self, status):
         if (not status.retweeted) and ('RT @' not in status.text):
             document = status._json
             print(document)
-            self.db_connection.insert_to_database(document)
+            self.inserter.insert_one(document)
 
     def on_error(self, status_code):
         if status_code == 420:
