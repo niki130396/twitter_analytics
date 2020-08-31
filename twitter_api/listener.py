@@ -36,6 +36,9 @@ class TwitterListener(StreamListener):
 
 
 class Streamer(TwitterAuthenticator):
+    """
+    A class that streams tweets according to a passed filter
+    """
     def __init__(self):
         super().__init__()
 
@@ -43,6 +46,33 @@ class Streamer(TwitterAuthenticator):
         stream_listener = TwitterListener()
         stream = Stream(auth=self.api.auth, listener=stream_listener)
         stream.filter(languages=['en'], track=filter_list)
+
+
+class Client(TwitterAuthenticator):
+    """
+    A class that can retrieve user-related information
+    """
+    def __init__(self, user):
+        super().__init__()
+        self.user = user
+
+    def get_user_timeline_tweets(self, num_tweets):
+        tweets = []
+        for tweet in Cursor(self.api.user_timeline, id=self.user).items(num_tweets):
+            tweets.append(tweet)
+        return tweets
+
+    def get_friend_list(self, num_friends):
+        friend_list = []
+        for friend in Cursor(self.api.friends, id=self.user).items(num_friends):
+            friend_list.append(friend)
+        return friend_list
+
+    def get_home_timeline_tweets(self, num_tweets):
+        home_timeline_tweets = []
+        for tweet in Cursor(self.api.home_timeline, id=self.user).items(num_tweets):
+            home_timeline_tweets.append(tweet)
+        return home_timeline_tweets
 
 
 obj = Streamer()
